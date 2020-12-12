@@ -1,7 +1,8 @@
-
 const express = require('express');
 
 const mongoose = require('mongoose');
+
+const path = require('path');
 
 const {Contact} = require('./model/contact');
 
@@ -11,7 +12,12 @@ const app = express();
 
 app.use(express.json());
 
-mongoose.connect('mongodb://localhost/kulkarniMani', {useNewUrlParser: true, useUnifiedTopology: true});
+// Using build folder as static files on the root domain and serve them up.
+app.use(express.static('build'));
+
+const connection = "mongodb+srv://mkulk1@unh.newhaven.edu:mani@messi143@kulkarniMani/kulkarniMani?retryWrites=true&w=majority";
+
+mongoose.connect(connection, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const db = mongoose.connection;
 
@@ -72,4 +78,11 @@ app.post('/createQuery',  async (request, response) => {
     }
 });
 
-app.listen(8080, () => console.log('Kulkarni Mani Server is up'))
+// When an unknown request comes through, send it the React app (used with React router)
+app.get('/*', (request, response) =>{
+
+    return response.sendFile(path.join(__dirname + '/../build/index.html'));
+
+});
+
+app.listen(process.env.PORT || 8080, () => console.log('Kulkarni Mani Server is up'))
